@@ -88,7 +88,8 @@ namespace :generate do
 
     name     = ENV['NAME']
     filename = "%s.rb" % ENV['NAME']
-    path     = APP ROOT.join('app/controllers', filename)
+    path     = APP_ROOT.join('app/controllers', filename)
+    p_name   = name.pluralize
 
     if File.exist?(path)
       raise "ERROR: File '#{path}' already exists"
@@ -97,7 +98,33 @@ namespace :generate do
     puts "Creating #{path}"
     File.open(path, 'w+') do |f|
       f.write(<<-EOF.strip_heredoc)
-        XXXXXXXX #{path} XXXXXXXXXX
+        get '/#{p_name}' do
+          #display a list of all #{p_name}
+        end
+
+        get '/#{p_name}/new' do
+          #return an HTML form for creating a new #{p_name}
+        end
+
+        post '/#{p_name}' do
+          #create a new #{p_name}
+        end
+
+        get '/#{p_name}/:id' do
+          #display a specific article #{p_name}
+        end
+
+        get '/#{p_name}/:id/edit' do
+          #return an HTML form for editing #{p_name}
+        end
+
+        put '/#{p_name}/:id' do
+          # update a specific #{p_name}
+        end
+
+        delete '/#{p_name}/:id' do
+          #delete a specific #{p_name}
+        end
       EOF
     end
   end
