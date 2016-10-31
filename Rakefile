@@ -90,10 +90,17 @@ namespace :generate do
     filename = "%s.rb" % ENV['NAME']
     path     = APP ROOT.join('app/controllers', filename)
 
-    
+    if File.exist?(path)
+      raise "ERROR: File '#{path}' already exists"
+    end
 
-
-
+    puts "Creating #{path}"
+    File.open(path, 'w+') do |f|
+      f.write(<<-EOF.strip_heredoc)
+        XXXXXXXX #{path} XXXXXXXXXX
+      EOF
+    end
+  end
 end
 
 namespace :db do
