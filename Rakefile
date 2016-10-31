@@ -80,6 +80,19 @@ namespace :generate do
       EOF
     end
   end
+  desc "Create a template controller in controllers"
+  task :controller do 
+    unless ENV.has_key?('NAME')
+      raise "Must specify a controller name, e.g., rake generate:controller NAME=user"
+    end
+
+    name     = ENV['NAME']
+    filename = "%s.rb" % ENV['NAME']
+    path     = APP ROOT.join('app/controllers', filename)
+
+    
+
+
 
 end
 
