@@ -36,7 +36,7 @@ ActiveRecord::Base.establish_connection(
   :host     => db.host,
   :port     => db.port,
   :username => db.user,
-  :password => db.password,
+  :password => 'sqlisfun',
   :database => DB_NAME,
   :encoding => 'utf8'
 )
