@@ -22,11 +22,44 @@ namespace :generate do
 
     puts "Creating #{model_path}"
     File.open(model_path, 'w+') do |f|
-      f.write(<<-EOF.strip_heredoc)
-        class #{model_name} < ActiveRecord::Base
-          # Remember to create a migration!
-        end
-      EOF
+      if model_name == "User"
+        f.write(<<-EOF.strip_heredoc)
+          class User < ActiveRecord::Base
+
+            def password
+              @password ||= Bcrypt::Password.new(self.encrypted_password)
+            end
+
+            def password=(plaintext)
+              @raw_password = plaintext
+              self.encrypted_password = BCrypt::Password.create(plaintext)
+            end
+
+            def authenticate(args)
+              user = User.find_by(email: args[:email])
+              if user && user.password == args[:password]
+                return user
+              end
+              nil
+            end
+
+            def password_is_valid
+              if @raw_password.nil?
+                errors.add("Password is required")
+              elsif @raw_password.length < 8
+                errors.add("Password must be 8 or more characters")
+              end
+            end
+
+          end
+        EOF
+      else
+        f.write(<<-EOF.strip_heredoc)
+          class #{model_name} < ActiveRecord::Base
+            # Remember to create a migration!
+          end
+        EOF
+      end
     end
   end
 
@@ -81,7 +114,7 @@ namespace :generate do
     end
   end
   desc "Create a template controller in controllers"
-  task :controller do 
+  task :controller do
     unless ENV.has_key?('NAME')
       raise "Must specify a controller name, e.g., rake generate:controller NAME=user"
     end
@@ -90,6 +123,7 @@ namespace :generate do
     filename = "%s.rb" % ENV['NAME']
     path     = APP_ROOT.join('app/controllers', filename)
     p_name   = name.pluralize
+    up_name  = p_name.capitalize
 
     if File.exist?(path)
       raise "ERROR: File '#{path}' already exists"
@@ -99,7 +133,8 @@ namespace :generate do
     File.open(path, 'w+') do |f|
       f.write(<<-EOF.strip_heredoc)
         get '/#{p_name}' do
-          #display a list of all #{p_name}
+          @#{p_name} = #{up_name}.all
+          erb :'#{p_name}/index'
         end
 
         get '/#{p_name}/new' do
